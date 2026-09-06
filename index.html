@@ -47,5 +47,86 @@ footer{text-align:center;color:#888;padding:30px 15px;border-top:1px solid #222;
   <section class="section"><h2>Servicios</h2><div class="empty"><strong>Sección preparada</strong>Añade aquí los servicios que ofrecerá E&R La Carretera.</div></section>
 </main>
 <footer>E&R La Carretera · Menú digital</footer>
+<script>
+const SUPABASE_URL = "https://cqjbgntjmhqkwebfzdiq.supabase.co";
+const SUPABASE_KEY = sb_publishable_6JT-iF5VhKKv-ouEbeASVg_gUFMJHnm
+
+const categorias = ["Comida", "Bebidas", "Picaderas", "Cócteles", "Tragos", "Servicios"];
+
+async function cargarProductos() {
+  try {
+    const respuesta = await fetch(
+      `${SUPABASE_URL}/rest/v1/products?select=*&available=eq.true&order=sort_order.asc`,
+      {
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar los productos");
+    }
+
+    const productos = await respuesta.json();
+
+    document.querySelectorAll(".section").forEach(seccion => {
+      const titulo = seccion.querySelector("h2");
+      if (!titulo) return;
+
+      const categoria = titulo.textContent.trim();
+      if (!categorias.includes(categoria)) return;
+
+      let contenedor = seccion.querySelector(".cards");
+
+      if (!contenedor) {
+        contenedor = document.createElement("div");
+        contenedor.className = "cards";
+        seccion.appendChild(contenedor);
+      }
+
+      contenedor.innerHTML = "";
+
+      const lista = productos.filter(
+        producto => producto.category === categoria
+      );
+
+      if (lista.length === 0) {
+        contenedor.innerHTML =
+          '<div class="empty"><strong>Próximamente</strong><br>Estamos preparando esta sección.</div>';
+        return;
+      }
+
+      lista.forEach(producto => {
+        const tarjeta = document.createElement("div");
+        tarjeta.className = "card";
+
+        tarjeta.innerHTML = `
+          ${
+            producto.image_url
+              ? `<img src="${producto.image_url}" alt="${producto.name}">`
+              : ""
+          }
+          <h3>${producto.name}</h3>
+          ${
+            producto.description
+              ? `<p>${producto.description}</p>`
+              : ""
+          }
+          <strong>${producto.price} CUP</strong>
+        `;
+
+        contenedor.appendChild(tarjeta);
+      });
+    });
+
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+cargarProductos();
+</script>
 </body>
 </html>
