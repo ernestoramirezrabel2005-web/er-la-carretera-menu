@@ -72,6 +72,11 @@ const SUPABASE_URL = "https://cqjbgntjmhqkwebfzdiq.supabase.co";
 const SUPABASE_KEY = sb_publishable_6JT-iF5VhKKv-ouEbeASVg_gUFMJHnm
 
 const categorias = ["Comida", "Bebidas", "Picaderas", "Cócteles", "Tragos", "Servicios"];
+function irCategoria(id) {
+  document.getElementById(id).scrollIntoView({
+    behavior: "smooth"
+  });
+}
 
 async function cargarProductos() {
   try {
